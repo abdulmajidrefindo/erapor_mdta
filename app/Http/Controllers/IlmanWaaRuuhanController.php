@@ -130,7 +130,7 @@ class IlmanWaaRuuhanController extends Controller
                 $siswaIlmanWaaRuuhan->rapor_siswa_id = 1;
                 $siswaIlmanWaaRuuhan->penilaian_deskripsi_id = 5; // 5 = Kosong
                 $siswaIlmanWaaRuuhan->penilaian_huruf_angka_id = 101; // 101 = 0
-                $siswaIlmanWaaRuuhan->jilid = 0;
+                $siswaIlmanWaaRuuhan->jilid = "0";
                 $siswaIlmanWaaRuuhan->halaman = 0;
                 if ($siswaIlmanWaaRuuhan->save()) {
                     $berhasil++;

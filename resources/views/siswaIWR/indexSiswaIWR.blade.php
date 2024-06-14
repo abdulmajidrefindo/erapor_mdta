@@ -96,18 +96,13 @@
                                 <tr>
                                     <td>{{ $s->siswa->nama_siswa }}</td>
                                     <td>{{ $s->siswa->nisn }}</td>
-                                    <td>{{ $s->siswa->sub_kelas->kelas->nama_kelas . ' ' . $s->siswa->sub_kelas->nama_sub_kelas }}
-                                    </td>
+                                    <td>{{ $s->siswa->sub_kelas->kelas->nama_kelas . ' ' . $s->siswa->sub_kelas->nama_sub_kelas }}</td>
                                     <td>{{ $s->ilman_waa_ruuhan->pencapaian }}</td>
-                                    @if ($s->jilid == 101)
-                                        <td>0</td>
+                                    <td>{{ $s->jilid }}</td>
+                                    @if ($s->halaman == 0 || $s->halaman == 101)
+                                    <td>Pra Tes</td>
                                     @else
-                                        <td>{{ $s->jilid }}</td>
-                                    @endif
-                                    @if ($s->halaman == 101)
-                                        <td>0</td>
-                                    @else
-                                        <td>{{ $s->halaman }}</td>
+                                    <td>{{ $s->halaman }}</td>
                                     @endif
                                     <td>
                                         @if ($s->penilaian_huruf_angka->nilai_angka !== null)

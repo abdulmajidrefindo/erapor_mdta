@@ -105,8 +105,27 @@ class SiswaIlmanWaaRuuhanSheet implements FromView, WithStyles, WithTitle
         $sheet->getStyle('A9:' . $this->getColumnIndex($this->column_length + 3) . $this->row_lenght + 11)->getBorders()->getAllBorders()->setBorderStyle('thin');
 
         //validation rule for nilai cell as integer between 0-100 and not empty only
-        $startCell = 'D11'; // Starting cell for validation
-        $endCell = $this->getColumnIndex($this->column_length + 3) . ($this->row_lenght + 10); // Ending cell for validation
+        $startCell = 'E11'; // Starting cell for validation
+        $endCell = 'E' . ($this->row_lenght + 10); // Ending cell for validation
+        $validationRange = $startCell . ':' . $endCell;
+        $validation = $sheet->getCell($startCell)->getDataValidation();
+        $validation->setType(DataValidation::TYPE_WHOLE);
+        $validation->setOperator(DataValidation::OPERATOR_BETWEEN);
+        $validation->setAllowBlank(false); 
+        $validation->setFormula1(0);
+        $validation->setFormula2(300);
+        $validation->setErrorStyle(DataValidation::STYLE_STOP);
+        $validation->setShowErrorMessage(true);
+        $validation->setErrorTitle('Input Salah');
+        $validation->setError('Nilai harus berupa angka antara 0-300');
+        $validation->setShowInputMessage(true);
+        $validation->setPromptTitle('Atur Penilaian');
+        $validation->setPrompt('Masukkan nilai antara 0-300');
+        $sheet->setDataValidation($validationRange, $validation);
+        
+        //validation rule for nilai cell as integer between 0-100 and not empty only
+        $startCell = 'F11'; // Starting cell for validation
+        $endCell = 'F' . ($this->row_lenght + 10); // Ending cell for validation
         $validationRange = $startCell . ':' . $endCell;
         $validation = $sheet->getCell($startCell)->getDataValidation();
         $validation->setType(DataValidation::TYPE_WHOLE);

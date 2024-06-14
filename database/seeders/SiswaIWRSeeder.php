@@ -29,7 +29,7 @@ class SiswaIWRSeeder extends Seeder
                     'profil_sekolah_id' => 1,
                     'periode_id' => 1,
                     'rapor_siswa_id' => 1,
-                    'jilid' => rand(1, 5),
+                    'jilid' => "An-Nas",
                     'halaman' => rand(1, 10),
                 ]);
             }

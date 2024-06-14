@@ -138,13 +138,9 @@ function formatDate($date) {
                         @foreach ($data_iwr as $n)
                         <tr>
                             <td>{{ $n->ilman_waa_ruuhan->pencapaian }}</td>
-                            @if ($n->jilid == 101)
-                            <td>0</td>
-                            @else
                             <td>{{ $n->jilid }}</td>
-                            @endif
-                            @if ($n->halaman == 101)
-                            <td>0</td>
+                            @if ($n->halaman == 0 || $n->halaman == 101)
+                            <td>Pra Tes</td>
                             @else
                             <td>{{ $n->halaman }}</td>
                             @endif

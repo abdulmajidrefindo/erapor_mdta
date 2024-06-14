@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('ilman_waa_ruuhans', function (Blueprint $table) {
             $table->id();
             $table->string('pencapaian');
-            $table->integer('jilid');
+            $table->string('jilid');
             $table->integer('halaman');
             $table->timestamps();
         });

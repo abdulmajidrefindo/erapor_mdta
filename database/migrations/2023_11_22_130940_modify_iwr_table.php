@@ -17,7 +17,7 @@ return new class extends Migration
         });
 
         Schema::table('siswa_ilman_waa_ruuhans', function (Blueprint $table) {
-            $table->integer('jilid');
+            $table->string('jilid');
             $table->integer('halaman');
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('ilman_waa_ruuhans', function (Blueprint $table) {
-            $table->integer('jilid');
+            $table->string('jilid');
             $table->integer('halaman');
             $table->dropForeign(['kelas_id']);
             $table->dropColumn('kelas_id');

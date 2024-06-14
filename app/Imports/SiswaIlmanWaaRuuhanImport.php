@@ -17,14 +17,14 @@ class SiswaIlmanWaaRuuhanImport implements ToCollection
     *
     * @return \Illuminate\Database\Eloquent\Model|null
     */
-
+    
     private $kode_file, $errorFlag = false, $message = '';
-
+    
     public function __construct($kode_file)
     {
         $this->kode_file = $kode_file;
     }
-
+    
     public function collection(Collection $rows)
     {
         $file_identifier = '';
@@ -55,22 +55,22 @@ class SiswaIlmanWaaRuuhanImport implements ToCollection
             }
         }
     }
-
+    
     function convertCamelCaseToReadable($inputString) {
         $result = preg_replace('/(?<!^)([A-Z])/', ' $1', $inputString);
         return $result;
     }
-
+    
     public function hasError() : bool
     {
         return $this->errorFlag;
     }
-
+    
     public function getMessages() : string
     {
         return $this->message;
     }
-
+    
     public function getLastRowIndex($row) // Mengembalikan index baris terakhir dari table data.
     {
         $lastRow = 0;
@@ -81,7 +81,7 @@ class SiswaIlmanWaaRuuhanImport implements ToCollection
         }
         return $lastRow-3; // Potong 2 baris terakhir, 1 baris kosong, 1 baris kode_file.
     }
-
+    
     public function getFirstRowIndex($row) // Mengembalikan index baris pertama dari table data.
     {
         
@@ -94,7 +94,7 @@ class SiswaIlmanWaaRuuhanImport implements ToCollection
         }
         return $firstRow+2; // Lompati baris pertama yang berisi merged row 'ID' header.
     }
-
+    
     public function getLastColumnIndex($row)
     {
         $lastColumn = 0;
@@ -106,7 +106,7 @@ class SiswaIlmanWaaRuuhanImport implements ToCollection
         }
         return $lastColumn;
     }
-
+    
     public function getNilaiId($rows)
     {
         $lastRow = $this->getLastRowIndex($rows)+1; // Tambah 1 baris, kode nilai ada di akhir tabel data.
@@ -114,31 +114,31 @@ class SiswaIlmanWaaRuuhanImport implements ToCollection
         $nilai_id = $rows[$lastRow]->toArray(); // Nilai ID ada di baris terakhir dari table data
         $nilai_id = array_slice($nilai_id, 3); // Potong 3 kolom pertama (ID, Nama, NISN)
         $nilai_id = array_filter($nilai_id);
-
+        
         return $nilai_id;
     }
-
+    
     public function getData($rows)
     {
         $firstRow = $this->getFirstRowIndex($rows);
         $lastRow = $this->getLastRowIndex($rows);
         $lastColumn = $this->getLastColumnIndex($rows);
-
+        
         $data = [];
         for ($i=$firstRow; $i <= $lastRow; $i++) { 
             $data[$i] = $rows[$i]->toArray();
         }
-
+        
         return $data;
     }
-
+    
     public function getKodeFile($rows)
     {
         $lastRow = $this->getLastRowIndex($rows)+3; // Tambah 3 baris, kode file ada di baris terakhir dari table data.
         $kode_file = $rows[$lastRow][1]; // Kode file ada di baris terakhir dari table data, kolom kedua.
         return decrypt($kode_file);
     }
-
+    
     public function updateOrCreate(array $condition, array $data)
     {
         $model = SiswaIlmanWaaRuuhan::where($condition)->first();
@@ -147,16 +147,20 @@ class SiswaIlmanWaaRuuhanImport implements ToCollection
             return;
         }
         foreach ($data as $key => $value) {
-            $model->$key = $this->penilaianHurufAngkaId($value);
+            if ($key === "penilaian_huruf_angka_id") {
+                $model->$key = $this->penilaianHurufAngkaId($value);
+            } else {
+                $model->$key = $value;
+            }
         }
         $model->save();
         return $model;
     }
-
+    
     public function saveData($rows){
         $nilai_id = $this->getNilaiId($rows);
         $data = $this->getData($rows);
-
+        
         foreach ($data as $key => $value) {
             $id_data = $value[0];
             foreach ($nilai_id as $key => $id) {
@@ -164,14 +168,14 @@ class SiswaIlmanWaaRuuhanImport implements ToCollection
                     'siswa_id' => $id_data,
                     'ilman_waa_ruuhan_id' => $id,
                 ], [
-                    'jilid' => $value[3], // Kolom ke-4
+                    'jilid' => "$value[3]", // Kolom ke-4
                     'halaman' => $value[4], // Kolom ke-5
                     'penilaian_huruf_angka_id' => $value[5], // Kolom ke-6
                 ]);
             }
         }
     }
-
+    
     public function penilaianHurufAngkaId($nilai)
     {
         $nilai = $nilai == null || $nilai == 0 || $nilai == '' || $nilai == '0' ? 101 : $nilai;

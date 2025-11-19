@@ -64,9 +64,11 @@ return [
     */
     
     'logo' => '<h4><b>E-RAPOR MDTA</b></h4>',
-    'logo_img' => 'vendor/adminlte/dist/img/sditii2.png',
+    // 'logo_img' => 'vendor/adminlte/dist/img/sditii2.png',
+    'logo_img' => 'dist/img/your_logo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     // 'logo_img_xl' => 'vendor/adminlte/dist/img/sditii2.png',
+    // 'logo_img_xl' => 'dist/img/your_logo.png',
     'logo_img_xl_class' => 'brand-image-xs',
     'logo_img_alt' => 'Logo',
     
@@ -86,7 +88,8 @@ return [
     'auth_logo' => [
         'enabled' => true,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/sditii2.png',
+            // 'path' => 'vendor/adminlte/dist/img/sditii2.png',
+            'path' => 'dist/img/your_logo.png',
             'alt' => 'Logo',
             'class' => '',
             'width' => 200,
@@ -109,7 +112,8 @@ return [
     'preloader' => [
         'enabled' => false,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/sditii2.png',
+            // 'path' => 'vendor/adminlte/dist/img/sditii2.png',
+            'path' => 'dist/img/your_logo.png',
             'alt' => 'Loading...',
             'effect' => 'animation__shake',
             'width' => 360,

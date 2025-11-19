@@ -262,8 +262,11 @@ class UserController extends Controller
             })
             ->addColumn('role', function ($row) {
                 $role = UserRoles::where('user_id', $row->id)->first();
-                $role_name = Roles::where('id', $role->role_id)->first()->role;
-                return $role_name;
+                if ($role && $role->role_id) {
+                    $roleRecord = Roles::where('id', $role->role_id)->first();
+                    return $roleRecord ? $roleRecord->role : '-';
+                }
+                return '-';
             })
             ->rawColumns(['action'])
             ->make(true);

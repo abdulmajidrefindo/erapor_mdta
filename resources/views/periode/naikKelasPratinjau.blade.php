@@ -15,7 +15,7 @@
                 <p>
                     Dari <strong>{{ $sumber->tahun_ajaran }} / {{ $sumber->semester == 1 ? 'Ganjil' : 'Genap' }}</strong>
                     ke <strong>{{ $target['tahun_ajaran'] }} / {{ $target['semester'] == 1 ? 'Ganjil' : 'Genap' }}</strong>.
-                    Siswa yang tidak dibawa tetap ada di periode lama dan rapornya masih bisa dicetak.
+                    Untuk tahun ajaran baru, kelas tujuan dipilih dari kelas yang sudah ada di periode ini. Siswa yang tidak dibawa tetap ada di periode lama dan rapornya masih bisa dicetak.
                 </p>
                 <form method="POST" action="{{ route('dataPeriode.naikKelas.store') }}">
                     @csrf
@@ -57,11 +57,24 @@
                                                 </select>
                                             @endif
                                         </td>
-                                        <td id="tujuan-{{ $siswa->id }}"
-                                            data-naik="{{ $barisSiswa['kelas_tujuan'] }}"
-                                            data-tinggal="{{ $barisSiswa['kelas_asal'] }}"
-                                            data-lulus="Tidak dibawa">
-                                            {{ $barisSiswa['kelas_tujuan'] }}
+                                        <td id="tujuan-{{ $siswa->id }}">
+                                            @if ($jenis === 'tahun_baru' && $siswa->sub_kelas_id)
+                                                <select name="kelas_tujuan[{{ $siswa->id }}]"
+                                                        class="form-control form-control-sm kelas-tujuan {{ $barisSiswa['aksi'] === 'lulus' ? 'd-none' : '' }}"
+                                                        data-naik="{{ $barisSiswa['default_naik'] }}"
+                                                        data-tinggal="{{ $barisSiswa['default_tinggal'] }}"
+                                                        {{ $barisSiswa['aksi'] === 'lulus' ? 'disabled' : 'required' }}>
+                                                    <option value="">Pilih kelas</option>
+                                                    @foreach ($opsi_kelas as $opsi)
+                                                        <option value="{{ $opsi->id }}" {{ (int) $barisSiswa['kelas_tujuan_id'] === (int) $opsi->id ? 'selected' : '' }}>
+                                                            {{ trim(optional($opsi->kelas)->nama_kelas . ' ' . $opsi->nama_sub_kelas) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <span class="tujuan-teks {{ $barisSiswa['aksi'] === 'lulus' ? '' : 'd-none' }}">Tidak dibawa</span>
+                                            @else
+                                                {{ $barisSiswa['kelas_tujuan'] }}
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -80,7 +93,19 @@
     <script>
         $('.aksi-siswa').on('change', function () {
             var tujuan = $('#tujuan-' + $(this).data('id'));
-            tujuan.text(tujuan.data($(this).val()));
+            var pilih = tujuan.find('select');
+            var teks = tujuan.find('.tujuan-teks');
+            if (!pilih.length) {
+                return;
+            }
+            if ($(this).val() === 'lulus') {
+                pilih.addClass('d-none').prop('disabled', true).prop('required', false);
+                teks.removeClass('d-none');
+                return;
+            }
+            pilih.removeClass('d-none').prop('disabled', false).prop('required', true);
+            teks.addClass('d-none');
+            pilih.val(pilih.data($(this).val()) || '');
         });
     </script>
 @stop

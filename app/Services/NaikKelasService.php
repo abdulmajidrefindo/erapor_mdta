@@ -74,10 +74,13 @@ class NaikKelasService
             ->where('periode_id', $sumber->id)
             ->orderBy('nama_siswa')
             ->get();
+        $opsi = $this->opsiKelas($sumber);
 
-        $baris = $siswa->map(function (Siswa $item) use ($target) {
+        $baris = $siswa->map(function (Siswa $item) use ($target, $opsi) {
             $tingkat = $this->tingkatDariKelas(optional($item->sub_kelas)->kelas);
             $aksi = $this->aksiAwal($tingkat, $target['naik_tingkat'], $item->sub_kelas_id);
+            $defaultNaik = $this->subDefault($opsi, $item->sub_kelas, 'naik');
+            $defaultTinggal = $this->subDefault($opsi, $item->sub_kelas, 'tinggal');
 
             return [
                 'siswa' => $item,
@@ -87,6 +90,9 @@ class NaikKelasService
                     ? trim($item->sub_kelas->kelas->nama_kelas . ' ' . $item->sub_kelas->nama_sub_kelas)
                     : 'Belum punya kelas',
                 'kelas_tujuan' => $this->labelTujuan($item, $aksi),
+                'kelas_tujuan_id' => $aksi === 'naik' ? $defaultNaik : ($aksi === 'tinggal' ? $defaultTinggal : null),
+                'default_naik' => $defaultNaik,
+                'default_tinggal' => $defaultTinggal,
             ];
         });
 
@@ -94,15 +100,16 @@ class NaikKelasService
             'sumber' => $sumber,
             'target' => $target,
             'jenis' => $jenis,
+            'opsi_kelas' => $opsi,
             'baris' => $baris,
         ];
     }
 
-    public function jalankan(Periode $sumber, string $jenis, array $aksiPerSiswa): array
+    public function jalankan(Periode $sumber, string $jenis, array $aksiPerSiswa, array $kelasTujuanPerSiswa = []): array
     {
         $targetInfo = $this->targetDari($sumber, $jenis);
 
-        return DB::transaction(function () use ($sumber, $jenis, $aksiPerSiswa, $targetInfo) {
+        return DB::transaction(function () use ($sumber, $jenis, $aksiPerSiswa, $kelasTujuanPerSiswa, $targetInfo) {
             $target = Periode::where('tahun_ajaran', $targetInfo['tahun_ajaran'])
                 ->where('semester', $targetInfo['semester'])
                 ->first();
@@ -131,8 +138,10 @@ class NaikKelasService
                 $keputusan[$siswa->id] = $aksi;
             }
 
+            $subSumber = $this->opsiKelas($sumber)->keyBy('id');
             $subTujuan = [];
             $kelasTujuanDipakai = [];
+            $pilihan = [];
 
             foreach ($siswaSumber as $siswa) {
                 $aksi = $keputusan[$siswa->id];
@@ -140,12 +149,19 @@ class NaikKelasService
                     continue;
                 }
 
-                $kelasTujuan = $this->kelasTujuan($siswa->sub_kelas->kelas, $aksi);
-                $kunciSub = $siswa->sub_kelas_id . ':' . $kelasTujuan->id;
-                if (!isset($subTujuan[$kunciSub])) {
-                    $subTujuan[$kunciSub] = $this->salinSubKelas($siswa->sub_kelas, $kelasTujuan, $target);
+                if ($targetInfo['naik_tingkat']) {
+                    $asalSub = $this->subDipilih($subSumber, $kelasTujuanPerSiswa, $siswa);
+                    $kelasMaster = $asalSub->kelas;
+                } else {
+                    $asalSub = $siswa->sub_kelas;
+                    $kelasMaster = $this->kelasTujuan($siswa->sub_kelas->kelas, $aksi);
                 }
-                $kelasTujuanDipakai[$kelasTujuan->id] = true;
+
+                if (!isset($subTujuan[$asalSub->id])) {
+                    $subTujuan[$asalSub->id] = $this->salinSubKelas($asalSub, $kelasMaster, $target);
+                }
+                $kelasTujuanDipakai[$kelasMaster->id] = true;
+                $pilihan[$siswa->id] = $asalSub->id;
             }
 
             foreach (array_keys($kelasTujuanDipakai) as $kelasId) {
@@ -163,8 +179,7 @@ class NaikKelasService
                     continue;
                 }
 
-                $kelasTujuan = $this->kelasTujuan($siswa->sub_kelas->kelas, $aksi);
-                $subBaru = $subTujuan[$siswa->sub_kelas_id . ':' . $kelasTujuan->id];
+                $subBaru = $subTujuan[$pilihan[$siswa->id]];
                 $baru = Siswa::create([
                     'nisn' => $siswa->nisn,
                     'nama_siswa' => $siswa->nama_siswa,
@@ -173,7 +188,7 @@ class NaikKelasService
                     'periode_id' => $target->id,
                     'rapor_siswa_id' => $siswa->rapor_siswa_id ?: 1,
                 ]);
-                $this->buatSlotNilaiKosong($baru, $kelasTujuan->id, $target);
+                $this->buatSlotNilaiKosong($baru, $subBaru->kelas_id, $target);
                 $disalin++;
                 if ($aksi === 'tinggal') {
                     $tinggal++;
@@ -228,6 +243,46 @@ class NaikKelasService
         if ($naikTingkat && $tingkat < 6 && !in_array($aksi, ['naik', 'tinggal'], true)) {
             throw new InvalidArgumentException('Siswa hanya dapat naik atau tinggal di tingkat yang sama.');
         }
+    }
+
+    private function opsiKelas(Periode $sumber)
+    {
+        return SubKelas::with('kelas')
+            ->where('periode_id', $sumber->id)
+            ->orderBy('kelas_id')
+            ->orderBy('nama_sub_kelas')
+            ->get();
+    }
+
+    private function subDefault($opsi, ?SubKelas $asal, string $aksi): ?int
+    {
+        if (!$asal || !$asal->kelas || !in_array($aksi, ['naik', 'tinggal'], true)) {
+            return null;
+        }
+
+        $tingkatAsal = $this->tingkatDariKelas($asal->kelas);
+        if ($tingkatAsal === null) {
+            return null;
+        }
+
+        $angka = $aksi === 'naik' ? $tingkatAsal + 1 : $tingkatAsal;
+        $cocok = $opsi->first(function (SubKelas $sub) use ($asal, $angka) {
+            return $sub->nama_sub_kelas === $asal->nama_sub_kelas
+                && $this->tingkatDariKelas($sub->kelas) === $angka;
+        });
+
+        return $cocok ? $cocok->id : null;
+    }
+
+    private function subDipilih($subSumber, array $kelasTujuanPerSiswa, Siswa $siswa): SubKelas
+    {
+        $id = (int) ($kelasTujuanPerSiswa[$siswa->id] ?? 0);
+        $dipilih = $subSumber->get($id);
+        if (!$dipilih || !$dipilih->kelas) {
+            throw new InvalidArgumentException('Siswa ' . $siswa->nama_siswa . ' belum memilih kelas tujuan yang sudah ada.');
+        }
+
+        return $dipilih;
     }
 
     private function kelasTujuan(Kelas $asal, string $aksi): Kelas

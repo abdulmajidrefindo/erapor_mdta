@@ -16,13 +16,15 @@ Pilihan semester genap hanya muncul saat periode berjalan masih semester ganjil.
 ## Langkah administrator
 
 1. Buka pratinjau. Periksa nama, kelas sekarang, dan kelas tujuan.
-2. Untuk tahun baru: ubah penempatan bila perlu.
+2. Untuk tahun baru: ubah penempatan bila perlu, lalu pilih **kelas tujuan** dari kelas yang sudah ada di periode ini. Tiap siswa boleh berbeda. Default-nya rombel yang sama di tingkat tujuan, jika kelas itu ada. Jika belum ada, daftar tetap bisa dipilih; simpan ditolak bila siswa yang naik atau tinggal belum punya tujuan.
    - Kelas 1–5: **Naik tingkat** atau **Tinggal di tingkat ini**.
    - Kelas 6: **Lulus, tidak dibawa** atau **Tinggal di tingkat ini**.
    - Siswa tanpa kelas tidak dibawa.
 3. Klik **Siapkan dan aktifkan**. Periode baru langsung aktif. Proses ini tidak bisa diulang untuk tujuan yang sama.
 
-Yang ikut tersalin: sub kelas beserta wali, dan kurikulum tingkat tujuan (mata pelajaran, hadis, doa, tahfidz, ibadah harian, dan Ilman Waa Ruuhan). Siswa Kelas 5 yang naik mendapat kurikulum Kelas 6 dari periode sebelumnya, bukan kurikulum Kelas 5.
+Semester genap tidak memakai pilihan kelas tujuan. Siswa tetap di kelasnya.
+
+Yang ikut tersalin: sub kelas yang dipilih beserta wali, dan kurikulum tingkat kelas itu (mata pelajaran, hadis, doa, tahfidz, ibadah harian, dan Ilman Waa Ruuhan). Nilai lama tidak ikut, karena sub kelas periode baru adalah wadah baru.
 
 Yang kosong di periode baru: seluruh nilai. Guru mengisinya dari menu **Data Nilai Siswa**. Catatan kelas tidak disalin.
 

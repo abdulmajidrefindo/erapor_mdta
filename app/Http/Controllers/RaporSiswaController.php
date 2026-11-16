@@ -23,7 +23,10 @@ class RaporSiswaController extends Controller
 {
     public function index(Request $request)
     {
-        $periode = Periode::where('status','aktif')->first();
+        $periodes = Periode::orderByDesc('tahun_ajaran')->orderByDesc('semester')->get();
+        $periode = $request->periode_id
+            ? Periode::findOrFail($request->periode_id)
+            : Periode::where('status','aktif')->first();
         $data_kelas = SubKelas::with('kelas')->where('periode_id', $periode->id)->get();
         foreach ($data_kelas as $key => $value) {
             $value->nama_kelas = $value->kelas->nama_kelas . " " . $value->nama_sub_kelas;
@@ -31,10 +34,10 @@ class RaporSiswaController extends Controller
         $kelas=$request->kelas_id;
         $kelas_aktif = null;
         if($kelas){
-            $data_siswa = Siswa::all()->where('sub_kelas_id', $kelas);
+            $data_siswa = Siswa::with('periode')->where('sub_kelas_id', $kelas)->where('periode_id', $periode->id)->get();
             $kelas_aktif = SubKelas::where('id', $kelas)->first();
         }else{
-            $data_siswa = Siswa::where('periode_id', $periode->id)->get();
+            $data_siswa = Siswa::with('periode')->where('periode_id', $periode->id)->get();
         }
         
         $rapor_siswa = RaporSiswa::first();
@@ -44,8 +47,9 @@ class RaporSiswaController extends Controller
             'data_siswa'=>$data_siswa,
             'data_kelas'=>$data_kelas,
             'kelas_aktif'=>$kelas_aktif,
-            'rapor_siswa'=>$rapor_siswa
-            
+            'rapor_siswa'=>$rapor_siswa,
+            'periodes'=>$periodes,
+            'periode'=>$periode,
         ]);
     }
     
@@ -105,7 +109,7 @@ class RaporSiswaController extends Controller
             $rata_rata = round($jumlah_nilai_akhir/$count, 2);
         }
         
-        $periode = Periode::where('status', 'aktif')->first();
+        $periode = $data_siswa->periode ?: Periode::where('status', 'aktif')->first();
         $profil_sekolah = ProfilSekolah::first();
         
         if($data_siswa->sub_kelas->kelas->id == 1 or $data_siswa->sub_kelas->kelas->id == 6){
@@ -174,7 +178,8 @@ class RaporSiswaController extends Controller
                 $rata_rata = round($jumlah_nilai_akhir/$count, 2);
             }
             
-            $periode = Periode::where('status', 'aktif')->first()->toArray();
+            $periode = optional(Periode::find(SubKelas::where('id', $data)->value('periode_id')))->toArray()
+                ?: Periode::where('status', 'aktif')->first()->toArray();
             $profil_sekolah = ProfilSekolah::first()->toArray();
             $data_print = [
                 'data_guru'=>$data_guru,
@@ -210,7 +215,7 @@ class RaporSiswaController extends Controller
         $data_d = SiswaDoa::with('doa_1','penilaian_huruf_angka')->where('siswa_id', $id)->get();
         $data_mapel = SiswaBidangStudi::with('siswa','uh_1','uh_2','uh_3','uh_4','tugas_1','tugas_2','uts','pas','akhir')->where('siswa_id', $id)->get();
         
-        $periode = Periode::where('status', 'aktif')->first();
+        $periode = $data_siswa->periode ?: Periode::where('status', 'aktif')->first();
         
         return view('/raporSiswa/showRaporSiswa', 
         [

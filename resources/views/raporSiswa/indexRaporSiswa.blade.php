@@ -46,7 +46,7 @@
                             @endif
                         </a>
                     </li>
-                    @if (Auth::user()->role->contains('role', 'Adiministrator'||'Wali Kelas'))
+                    @if (Auth::user()->role->contains('role', 'Administrator') || Auth::user()->role->contains('role', 'Wali Kelas'))
                     <li class="nav-item" role="presentation">
                         <a class="nav-link" id="controller-tab-print-per-kelas" data-toggle="pill"
                         href="#content-tab-print-per-kelas" role="tab"
@@ -74,6 +74,23 @@
                 <div class="tab-content" id="raporTabContent">
                     <div class="tab-pane active show" id="content-tab-rapor-table" role="tabpanel"
                     aria-labelledby="controller-tab-rapor-table">
+                    @isset($periodes)
+                    <form method="GET" action="{{ route('raporSiswa.index') }}" class="mb-3">
+                        <div class="form-row align-items-end">
+                            <div class="col-md-4">
+                                <label for="periode_id">Periode rapor</label>
+                                <select name="periode_id" id="periode_id" class="form-control" onchange="this.form.submit()">
+                                    @foreach ($periodes as $item)
+                                        <option value="{{ $item->id }}" {{ isset($periode) && $periode->id == $item->id ? 'selected' : '' }}>
+                                            {{ $item->tahun_ajaran }} / {{ $item->semester == 1 ? 'Ganjil' : 'Genap' }}{{ $item->status == 'aktif' ? ' (aktif)' : '' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                    <p class="text-muted">Memilih periode lama hanya untuk melihat dan mencetak. Periode aktif tidak berubah.</p>
+                    @endisset
                     {{-- <div class="row">
                         <div class="col-sm-4">
                             <div class="form-group">
@@ -118,7 +135,7 @@
                             <td>{{ $s->sub_kelas->guru->nama_guru }}</td>
                             <td class="text-center">
                                 <a href="{{ url('/') }}/raporSiswa/{{ encrypt($s->id) }}/detail" class="btn btn-sm btn-success mx-1 shadow">Detail</a>
-                                @if (Auth::user()->role->contains('role', 'Adiministrator'||'Wali Kelas'))
+                                @if (Auth::user()->role->contains('role', 'Administrator') || Auth::user()->role->contains('role', 'Wali Kelas'))
                                 <a href="{{ url('/') }}/raporSiswa/{{ encrypt($s->id) }}/print" class="btn btn-sm btn-success mx-1 shadow">Print</a>
                                 @endif
                             </td>

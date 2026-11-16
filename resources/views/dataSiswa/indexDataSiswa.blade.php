@@ -485,7 +485,7 @@
                                         let id = $(this).attr('data-id');
                                         Swal.fire({
                                             title: 'Apakah anda yakin?',
-                                            text: "Data yang dihapus tak dapat dikembalikan!",
+                                            text: "Menghapus siswa juga menghapus nilai dan rapor lamanya. Data tidak dapat dikembalikan. Biarkan siswa di periode lama jika rapor kelulusan masih perlu dicetak.",
                                             icon: 'warning',
                                             showCancelButton: true,
                                             confirmButtonColor: '#3085d6',

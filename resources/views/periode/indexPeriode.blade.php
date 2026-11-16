@@ -55,6 +55,12 @@
                         <div class="tab-content" id="periodeTabContent">
                             <div class="tab-pane active show" id="content-tab-periode-table" role="tabpanel"
                                 aria-labelledby="controller-tab-periode-table">
+                                @if (Auth::user()->role->contains('role', 'Administrator'))
+                                    <a href="{{ route('dataPeriode.naikKelas') }}" class="btn bg-gradient-green mb-3">Siapkan semester berikutnya</a>
+                                @endif
+                                @if (session('naik_kelas_gagal'))
+                                    <div class="alert alert-danger">{{ session('naik_kelas_gagal') }}</div>
+                                @endif
                                 <table id="example1" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>

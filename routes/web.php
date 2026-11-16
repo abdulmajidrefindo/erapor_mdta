@@ -15,6 +15,7 @@ use App\Http\Controllers\SiswaIlmanWaaRuuhanController;
 use App\Http\Controllers\SiswaBidangStudiController;
 use App\Http\Controllers\RaporSiswaController;
 use App\Http\Controllers\KelasController;
+use App\Http\Controllers\NaikKelasController;
 
 use App\Http\Controllers\DoaController;
 use App\Http\Controllers\HadistController;
@@ -60,6 +61,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/dataUser/import_excel', [UserController::class, 'import_excel'])->name('user.import_excel');
 
     Route::post('/dataSiswaKelas', [SiswaController::class, 'index']);
+    Route::get('/dataPeriode/naik-kelas', [NaikKelasController::class, 'create'])->name('dataPeriode.naikKelas');
+    Route::post('/dataPeriode/naik-kelas/pratinjau', [NaikKelasController::class, 'preview'])->name('dataPeriode.naikKelas.preview');
+    Route::post('/dataPeriode/naik-kelas', [NaikKelasController::class, 'store'])->name('dataPeriode.naikKelas.store');
     Route::resource('/dataPeriode', PeriodeController::class);
 
     Route::get('/getTableUser', [UserController::class, 'getTable'])->name('user.getTable');

@@ -15,8 +15,8 @@ Pilihan semester genap hanya muncul saat periode berjalan masih semester ganjil.
 
 ## Langkah administrator
 
-1. Buka pratinjau. Periksa nama, kelas sekarang, dan kelas tujuan.
-2. Untuk tahun baru: ubah penempatan bila perlu, lalu pilih **kelas tujuan** dari kelas yang sudah ada di periode ini. Tiap siswa boleh berbeda. Default-nya rombel yang sama di tingkat tujuan, jika kelas itu ada. Jika belum ada, daftar tetap bisa dipilih; simpan ditolak bila siswa yang naik atau tinggal belum punya tujuan.
+1. Buka pratinjau. Siswa dikelompokkan per kelas.
+2. Untuk tahun baru: ubah penempatan bila perlu, lalu pilih **kelas tujuan** dari kelas yang sudah ada di periode ini. Dropdown pada baris kelas mengisi semua siswa di kelas itu yang tidak lulus. Dropdown pada baris siswa tetap bisa diubah satu per satu. Default-nya rombel yang sama di tingkat tujuan, jika kelas itu ada. Jika belum ada, daftar tetap bisa dipilih; simpan ditolak bila siswa yang naik atau tinggal belum punya tujuan.
    - Kelas 1–5: **Naik tingkat** atau **Tinggal di tingkat ini**.
    - Kelas 6: **Lulus, tidak dibawa** atau **Tinggal di tingkat ini**.
    - Siswa tanpa kelas tidak dibawa.

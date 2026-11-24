@@ -147,7 +147,7 @@ class SiswaDoaController extends Controller
         $sub_kelas = SubKelas::with('kelas','guru')->where('id', $sub_kelas_id)->first();
         $kelas = $sub_kelas->kelas->nama_kelas;
         $nama_sub_kelas = $sub_kelas->nama_sub_kelas;
-        $wali_kelas = $sub_kelas->guru->nama_guru;
+        $wali_kelas = optional($sub_kelas->guru)->nama_guru ?? '-';
         $periode = Periode::where('status','aktif')->first();
         $semester = $periode->semester  == 1 ? 'Ganjil' : 'Genap';
         $tahun_ajaran = $periode->tahun_ajaran;

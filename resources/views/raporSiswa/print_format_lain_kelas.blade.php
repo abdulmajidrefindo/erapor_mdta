@@ -356,7 +356,7 @@ function formatDate($date) {
         <br />
         <br />
         <p></p>
-        <p><strong><u>{{ $data['0']['data_guru']['0']['nama_guru'] }}</u></strong></p>
+        <p><strong><u>{{ $data['0']['data_guru']['0']['nama_guru'] ?? '-' }}</u></strong></p>
         {{-- <p>NIY. {{ $data_siswa->sub_kelas->guru->nip }}</p> --}}
     </div>
     

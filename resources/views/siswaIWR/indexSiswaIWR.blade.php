@@ -112,7 +112,7 @@
                                         <span class="badge badge-danger">Kosong</span>
                                         @endif
                                     </td>
-                                    <td>{{ $s->ilman_waa_ruuhan->guru->nama_guru }}</td>
+                                    <td>{{ optional(optional($s->ilman_waa_ruuhan)->guru)->nama_guru ?? '-' }}</td>
                                     <td>
                                         <a href="{{ route('siswaIlmanWaaRuuhan.show', encrypt($s->id)) }}"
                                             class="btn btn-sm btn-success mx-1 shadow detail"><i

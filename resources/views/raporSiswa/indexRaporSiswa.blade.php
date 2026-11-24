@@ -132,7 +132,7 @@
                             <td>{{ $s->nisn }}</td>
                             <td>{{ $s->sub_kelas->kelas->nama_kelas . ' ' . $s->sub_kelas->nama_sub_kelas }}
                             </td>
-                            <td>{{ $s->sub_kelas->guru->nama_guru }}</td>
+                            <td>{{ optional(optional($s->sub_kelas)->guru)->nama_guru ?? '-' }}</td>
                             <td class="text-center">
                                 <a href="{{ url('/') }}/raporSiswa/{{ encrypt($s->id) }}/detail" class="btn btn-sm btn-success mx-1 shadow">Detail</a>
                                 @if (Auth::user()->role->contains('role', 'Administrator') || Auth::user()->role->contains('role', 'Wali Kelas'))
